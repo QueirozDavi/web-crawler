@@ -4,6 +4,8 @@ target/
 !**/src/main/**
 !**/src/test/**
 
+/src/main/resources/crawler4j
+
 ### STS ###
 .apt_generated
 .classpath
