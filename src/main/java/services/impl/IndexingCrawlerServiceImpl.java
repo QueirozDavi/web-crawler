@@ -4,15 +4,19 @@ import com.project.webcrawler.exception.BadRequestException;
 import edu.uci.ics.crawler4j.crawler.Page;
 import edu.uci.ics.crawler4j.parser.HtmlParseData;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import services.IndexingCrawlerService;
+import services.NaiveClassifierService;
 
 @Slf4j
 @Service
 public class IndexingCrawlerServiceImpl implements IndexingCrawlerService {
 
 //    private static CrawlerIndexer indexer = new CrawlerIndexer();
-//    private static NaiveClassifier classifier = new NaiveClassifier();
+
+    @Autowired
+    private static NaiveClassifierService classifier;
 
     @Override
     public void visiting(Page page) {
