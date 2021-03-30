@@ -1,32 +1,45 @@
 package com.project.webcrawler.service;
 
-import edu.uci.ics.crawler4j.crawler.CrawlConfig;
-import edu.uci.ics.crawler4j.crawler.CrawlController;
+import com.project.webcrawler.model.CrawlerStatistics;
+import com.project.webcrawler.model.entity.Crawler;
+import com.project.webcrawler.repository.CrawlerRepository;
 import edu.uci.ics.crawler4j.crawler.Page;
 import edu.uci.ics.crawler4j.crawler.WebCrawler;
-import edu.uci.ics.crawler4j.fetcher.PageFetcher;
 import edu.uci.ics.crawler4j.parser.HtmlParseData;
-import edu.uci.ics.crawler4j.robotstxt.RobotstxtConfig;
-import edu.uci.ics.crawler4j.robotstxt.RobotstxtServer;
 import edu.uci.ics.crawler4j.url.WebURL;
 import lombok.extern.slf4j.Slf4j;
+import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.io.File;
+import java.time.LocalDateTime;
 import java.util.Set;
 import java.util.regex.Pattern;
+
+import static com.project.webcrawler.util.PatternUtils.excludePattern;
 
 @Slf4j
 @Service
 public class HtmlCrawlerService extends WebCrawler {
 
-    private final static Pattern EXCLUSIONS = Pattern.compile(".*(\\.(css|js|xml|gif|jpg|png|mp3|mp4|zip|gz|pdf))$");
+    @Value("${website.url}")
+    private String URL;
+    private final static Pattern EXCLUSIONS = excludePattern();
+    private int count = 1;
 
-//    @Value("${website.url}")
-    private String URL = "https://github.com/";
+    @Value("${crawlers.number}")
+    private int NUM_CRAWLERS;
 
-    private final int NUM_CRAWLERS = 1;
+    private final CrawlerStatistics stats = new CrawlerStatistics();
+    private final ModelMapper mapper;
+    private final CrawlerRepository repository;
+
+    @Autowired
+    public HtmlCrawlerService(ModelMapper mapper, CrawlerRepository repository) {
+        this.mapper = mapper;
+        this.repository = repository;
+    }
 
     @Override
     public boolean shouldVisit(Page referringPage, WebURL url) {
@@ -36,32 +49,17 @@ public class HtmlCrawlerService extends WebCrawler {
 
     @Override
     public void visit(Page page) {
-        String url = page.getWebURL().getURL();
-
+        stats.incrementProcessedPageCount();
         if (page.getParseData() instanceof HtmlParseData) {
             HtmlParseData htmlParseData = (HtmlParseData) page.getParseData();
-            String title = htmlParseData.getTitle();
-            String text = htmlParseData.getText();
-            String html = htmlParseData.getHtml();
             Set<WebURL> links = htmlParseData.getOutgoingUrls();
+            stats.incrementTotalLinksCount(links.size());
 
-            // do something with the collected data
+            if (count == NUM_CRAWLERS)
+                repository.save(mapper.map(htmlParseData, Crawler.class));
+
+            count++;
         }
     }
 
-    public void crawlerSetup() throws Exception {
-        File crawlStorage = new File("src/main/resources/crawler4j");
-        CrawlConfig config = new CrawlConfig();
-        config.setCrawlStorageFolder(crawlStorage.getAbsolutePath());
-        PageFetcher pageFetcher = new PageFetcher(config);
-        RobotstxtConfig robotstxtConfig = new RobotstxtConfig();
-        RobotstxtServer robotstxtServer= new RobotstxtServer(robotstxtConfig, pageFetcher);
-        CrawlController controller = new CrawlController(config, pageFetcher, robotstxtServer);
-
-        controller.addSeed(URL);
-
-        CrawlController.WebCrawlerFactory<HtmlCrawlerService> factory = HtmlCrawlerService::new;
-
-        controller.start(factory, NUM_CRAWLERS);
-    }
 }

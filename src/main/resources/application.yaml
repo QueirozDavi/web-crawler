@@ -1,4 +1,11 @@
 spring:
+  data:
+    mongodb:
+      database: web-crawler
+      uri: mongodb://pme:123456@localhost:27017/?authSource=admin
+      repositories:
+        type: auto
+
   jackson:
     property-naming-strategy: SNAKE_CASE
     application:
@@ -10,4 +17,15 @@ server:
     contextPath: /web-crawler
 
 website:
-  url: https://www.baeldung.com/
+  url: https://www.hltv.org/results
+
+crawlers:
+  number: 1
+  politenessDelay: 1000
+  maxDepthOfCrawling: 2
+  maxPagesToFetch: 10
+  includeBinaryContent: false
+
+
+path:
+  name: src/main/resources/crawler4j
