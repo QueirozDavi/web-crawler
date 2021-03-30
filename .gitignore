@@ -5,6 +5,8 @@ target/
 !**/src/test/**
 
 /src/main/resources/crawler4j
+/src/test/resources/crawler4j
+mongo-volume/**
 
 ### STS ###
 .apt_generated
