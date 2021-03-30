@@ -25,7 +25,7 @@ public class CrawlerController {
     }
 
     @GetMapping
-    @ApiOperation("InitWebCrawler")
+    @ApiOperation("Init Web Crawler")
     @ApiResponses({
             @ApiResponse(code = 200, message = "OK."),
             @ApiResponse(code = 500, message = "Internal Server Error.", response = ResponseEntity.class),
