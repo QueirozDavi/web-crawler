@@ -55,6 +55,8 @@ public class HtmlCrawlerService extends WebCrawler {
             Set<WebURL> links = htmlParseData.getOutgoingUrls();
             stats.incrementTotalLinksCount(links.size());
 
+            //here you can do anything you want with htmlParseData, in there are the info about the webpage
+
             if (count == NUM_CRAWLERS)
                 repository.save(mapper.map(htmlParseData, Crawler.class));
 
