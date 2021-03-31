@@ -1,5 +1,6 @@
 package com.project.webcrawler.factory;
 
+import com.project.webcrawler.model.dto.CrawlerResponseDTO;
 import com.project.webcrawler.model.entity.Crawler;
 import edu.uci.ics.crawler4j.url.WebURL;
 
@@ -9,9 +10,17 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public class CrawlerResponseDTOFactory {
+public class CrawlerFactory {
 
-    public static Crawler generateResponse() {
+    public static CrawlerResponseDTO generateResponseDTO() {
+        return CrawlerResponseDTO.builder()
+                .visitedWebSiteName("Xpto | Web Site")
+                .executedAtTime(LocalDateTime.now())
+                .success(true)
+                .build();
+    }
+
+    public static Crawler generateValidCrawler() {
         return Crawler.builder()
                 .visitedWebSiteName("Xpto | Web Site")
                 .executedAtTime(LocalDateTime.now())
